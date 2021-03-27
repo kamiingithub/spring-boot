@@ -135,6 +135,11 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		registerWebApplicationScopes();
 	}
 
+	/**
+	 * refresh spring boot容器
+	 * @throws BeansException
+	 * @throws IllegalStateException
+	 */
 	@Override
 	public final void refresh() throws BeansException, IllegalStateException {
 		try {
@@ -146,10 +151,14 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		}
 	}
 
+	/**
+	 * 覆盖父类AbstractApplicationContext
+	 */
 	@Override
 	protected void onRefresh() {
 		super.onRefresh();
 		try {
+			// 创建Tomcat服务
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -160,6 +169,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	@Override
 	protected void finishRefresh() {
 		super.finishRefresh();
+		// 启动Tomcat服务
 		WebServer webServer = startWebServer();
 		if (webServer != null) {
 			publishEvent(new ServletWebServerInitializedEvent(webServer, this));
@@ -169,6 +179,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	@Override
 	protected void onClose() {
 		super.onClose();
+		// 停止并释放Tomcat服务
 		stopAndReleaseWebServer();
 	}
 
